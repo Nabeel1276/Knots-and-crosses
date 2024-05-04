@@ -1,0 +1,32 @@
+{
+  "name": "Knots And Crosses",
+  "version": "1.0.0",
+  "description": "A simple board game",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest --watchAll"
+  },
+  "keywords": [
+    "board game",
+    "knots and crosses"
+  ],
+  "author": "Nabeel",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "text-encoding": "^0.7.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "@babel/preset-env": "^7.15.0",
+    "babel-jest": "^27.0.6",
+    "jest": "^27.5.1",
+    "jsdom": "^24.0.0",
+    "supertest": "^6.3.4"
+  },
+  "jest": {
+    "testEnvironment": "jsdom"
+  }
+}
