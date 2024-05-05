@@ -1,14 +1,10 @@
+const { initialiseRestartButton } = require('./index.js');
+
+
 // Define the gridSections, currentPlayer, turnDisplay, and winningConditions as constants
 let gridSections = document.querySelectorAll('.grid-section');
 let currentPlayer = 'X'; 
 let turnDisplay = document.querySelector('.turnDisplay');
-
-// Function to initialize the restart button and add event listener
-const initialiseRestartButton = () => {
-    const button = document.querySelector('.restartButton');
-    button.addEventListener('click', resetBoard);
-    return button;
-};
 
 // Define winning conditions
 let winningConditions = [
@@ -108,10 +104,7 @@ const sectionMock = {
     textContent: ''
 };
 
-// Fake
 const alertFake = jest.fn();
-
-// Stub
 const resetBoardStub = jest.fn();
 
 describe('switchPlayer', () => {

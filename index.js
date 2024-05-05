@@ -76,3 +76,8 @@ const handleSectionClick = (e) => {
 gridSections.forEach(section => {
     section.addEventListener('click', handleSectionClick);
 });
+
+module.exports = {
+    initialiseRestartButton,
+    switchPlayer
+};
