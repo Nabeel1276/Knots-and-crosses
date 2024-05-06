@@ -67,12 +67,14 @@ const handleCellClick = (e) => {
 
 const winnerAlert = () =>{
     const message = `Game over! ${dictionary[currentPlayer]} wins!`;
+    alert(message);
     turnDisplay.textContent = message;
     clearInterval(winnerTimer);
 }
 
 const drawAlert = () =>{
     const message = "Game over! It's a Draw!";
+    alert(message);
     turnDisplay.textContent = message;
     clearInterval(drawTimer);
 }
@@ -95,15 +97,16 @@ let resetGame = () => {
     resetBoard();
 };
 
+const initialiseGame = () => {
+    initialiseRestartButton()
+    resetBoard()
+}
+
 // Add event listeners to grid sections
 gridSections.forEach(section => {
     section.addEventListener('click', handleCellClick);
 });
 
-const initialiseGame = () => {
-    initialiseRestartButton()
-    resetBoard()
-}
 initialiseGame();
 
 module.exports = {
