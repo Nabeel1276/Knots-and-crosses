@@ -42,6 +42,7 @@ const checkForWinner = () => {
         const firstSymbol = symbols[0];
         if (firstSymbol && symbols.every(symbol => symbol === firstSymbol)) {
             // we have a winning combination
+            alert(`Game over! Player ${currentPlayer} wins!`);
             return true;
         }
     }

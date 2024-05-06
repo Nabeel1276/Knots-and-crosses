@@ -1,6 +1,3 @@
-// const { initialiseRestartButton } = require('./index.js');
-
-// Define the gridSections, currentPlayer, turnDisplay, and winningConditions as constants
 let gridSections = document.querySelectorAll('.grid-section');
 let currentPlayer = 'X'; 
 let turnDisplay = document.querySelector('.turnDisplay');
@@ -47,10 +44,10 @@ const checkForWinner = () => {
         const firstSymbol = symbols[0];
         if (firstSymbol && symbols.every(symbol => symbol === firstSymbol)) {
             // we have a winning combination
+            alert(`Game over! Player ${currentPlayer} wins!`);
             return true;
         }
     }
-    alert(`Game over! Player ${currentPlayer} wins!`);
     return false; // No winning combination found
 };
 
@@ -113,38 +110,9 @@ gridSections.forEach(section => {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //logic above
 
 turnDisplay = { textContent: '' };
-
  gridSections = [
     { textContent: '' }, { textContent: '' }, { textContent: '' },
     { textContent: '' }, { textContent: '' }, { textContent: '' },
