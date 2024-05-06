@@ -1,17 +1,34 @@
-const { initialiseRestartButton } = require('./index.js');
-
+// const { initialiseRestartButton } = require('./index.js');
 
 // Define the gridSections, currentPlayer, turnDisplay, and winningConditions as constants
 let gridSections = document.querySelectorAll('.grid-section');
 let currentPlayer = 'X'; 
 let turnDisplay = document.querySelector('.turnDisplay');
+let winnerTimer;
+let drawTimer;
+let gameCompleted = false;
+const dictionary = {"O": "Knots", "X": "Cross"};
 
 // Define winning conditions
-let winningConditions = [
+let winningConditionsList = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
     [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
     [0, 4, 8], [2, 4, 6]             // Diagonals
 ];
+
+const isGameCompleted = () => {
+    // check if game is completed by checking if any available cells remaining
+    const emptyCells = [];
+    for (let i = 0; i < gridSections.length; i++) {
+        if (gridSections[i].innerHTML === "") {
+            emptyCells.push(gridSections[i]);
+        }
+    }
+    if(emptyCells.length == 0){
+        gameCompleted = true;
+        drawTimer = setInterval(drawAlert, 300);
+    }
+}
 
 // Function to switch the player
 const switchPlayer = () => {
@@ -20,59 +37,109 @@ const switchPlayer = () => {
     } else {
         currentPlayer = 'X';
     }
-    turnDisplay.textContent = `Player ${currentPlayer}'s Turn`;
+    turnDisplay.textContent = `${dictionary[currentPlayer]}'s Turn`;
 };
 
-
-
-// Function to check if the game has ended
-const checkGameEnd = () => {
-    for (let i = 0; i < winningConditions.length; i++) {
-        const combination = winningConditions[i];
+const checkForWinner = () => {
+    for (let i = 0; i < winningConditionsList.length; i++) {
+        const combination = winningConditionsList[i];
         const symbols = combination.map(index => gridSections[index].textContent);
         const firstSymbol = symbols[0];
         if (firstSymbol && symbols.every(symbol => symbol === firstSymbol)) {
-            return true; // Winning combination found
+            // we have a winning combination
+            return true;
         }
     }
     alert(`Game over! Player ${currentPlayer} wins!`);
     return false; // No winning combination found
 };
 
-// Function to reset the board
+const handleCellClick = (e) => {
+    if(!gameCompleted) {
+        const gridSection = e.target;
+        if (!gridSection.textContent) {
+            let a = gridSection.textContent = currentPlayer;
+    
+            if (checkForWinner()) {
+                winnerTimer = setInterval(winnerAlert, 300);
+                gameCompleted = true;
+            } else {
+                switchPlayer();
+                isGameCompleted();
+            }
+        }        
+    }
+};
+
+const winnerAlert = () =>{
+    const message = `Game over! ${dictionary[currentPlayer]} wins!`;
+    turnDisplay.textContent = message;
+    clearInterval(winnerTimer);
+}
+
+const drawAlert = () =>{
+    const message = "Game over! It's a Draw!";
+    turnDisplay.textContent = message;
+    clearInterval(drawTimer);
+}
+
+
+const initialiseRestartButton = () => {
+    const button = document.querySelector('.restartButton');
+    button.addEventListener('click', resetGame);
+};
+
 let resetBoard = () => {
     gridSections.forEach(section => {
         section.textContent = '';
     });
     currentPlayer = 'X';
-    turnDisplay.textContent = `Player ${currentPlayer}'s Turn`;
+    turnDisplay.textContent = `${dictionary[currentPlayer]}'s Turn`;
 };
 
-// Function to reset the entire game
 let resetGame = () => {
+    gameCompleted = false;
     resetBoard();
 };
 
-// Function to handle a click on a grid section
-const handleSectionClick = (e) => {
-    const gridSection = e.target;
-
-    if (!gridSection.textContent) {
-        gridSection.textContent = currentPlayer;
-
-        if (checkGameEnd()) {
-            alert(`Game over! Player ${currentPlayer} wins!`);
-            resetGame();
-        } else {
-            switchPlayer();
-        }
-    }
-};
+const initialiseGame = () => {
+    initialiseRestartButton()
+    resetBoard()
+}
 
 // Add event listeners to grid sections
 gridSections.forEach(section => {
-    section.addEventListener('click', handleSectionClick);
+    section.addEventListener('click', handleCellClick);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //logic above
 
@@ -121,7 +188,7 @@ describe('switchPlayer', () => {
     });
 });
 
-describe('checkGameEnd', () => {
+describe('checkForWinner', () => {
     beforeEach(() => {
         gridSections; // Ensure gridSections is initialized before each test
     });
@@ -133,9 +200,8 @@ describe('checkGameEnd', () => {
             { textContent: '' }, { textContent: '' }, { textContent: '' }
         ];
         let emptyGridState = ['', '', '', '', '', '', '', '', ''];
-        expect(checkGameEnd(emptyGridState)).toBe(false);
+        expect(checkForWinner(emptyGridState)).toBe(false);
     });
-    
 
     it('should return true when a winning condition is met', () => {
         gridSections = [
@@ -144,7 +210,7 @@ describe('checkGameEnd', () => {
             { textContent: '' }, { textContent: '' }, { textContent: '' }
         ];
         let winningGridState = ['X', 'X', 'X', '', '', '', '', '', ''];
-        expect(checkGameEnd(winningGridState)).toBe(true);
+        expect(checkForWinner(winningGridState)).toBe(true);
     });
 });
 
@@ -153,18 +219,17 @@ jest.spyOn(document, 'querySelectorAll').mockReturnValue([sectionMock, sectionMo
 window.alert = alertFake;
 
 describe('Game functionality UI tests', () => {
-    //Mock
+
     it('should add event listener to button', () => {
         initialiseRestartButton();
         expect(buttonMock.addEventListener).toHaveBeenCalled();
     });
 
-    //Fake
     it('should call alert when the game ends', () => {
-        checkGameEnd();
+        checkForWinner();
         expect(alertFake).toHaveBeenCalled();
     });
-    //Stub
+
     it('should call resetBoard when resetGame is called', () => {
         const resetBoardSpy = jest.fn(); // Create a mock function
         const originalResetBoard = resetBoard; // Store the original resetBoard function
@@ -180,13 +245,12 @@ describe('Game functionality UI tests', () => {
         resetBoard = originalResetBoard;
     });
 
-    // Mockq
     it('should add event listener to grid sections', () => {
-        let handleSectionClick = jest.fn(); // Create a mock function
-        let originalHandleSectionClick = handleSectionClick; // Store the original handleSectionClick function
+        let handleCellClick = jest.fn(); // Create a mock function
+        let originalHandleCellClick = handleCellClick; // Store the original handleSectionClick function
         
         // Replace handleSectionClick with the mock function
-        handleSectionClick = handleSectionClick;
+        handleCellClick = handleCellClick;
 
         // Create mock grid sections with addEventListener method
         const mockGridSections = Array.from({ length: 9 }, () => ({
@@ -194,26 +258,24 @@ describe('Game functionality UI tests', () => {
         }));
 
         mockGridSections.forEach(section => {
-            section.addEventListener('click', handleSectionClick);
+            section.addEventListener('click', handleCellClick);
         });
 
         expect(mockGridSections[0].addEventListener).toHaveBeenCalled(); // Expect addEventListener to have been called on at least one grid section
-            handleSectionClick = originalHandleSectionClick;
+        handleCellClick = originalHandleCellClick;
     });
-        // Fake
         it('should display a congratulatory message when the game ends', () => {
-            checkGameEnd();
+            checkForWinner();
             expect(window.alert).toHaveBeenCalledWith(`Game over! Player ${currentPlayer} wins!`);
         });
 
-        // Stub
         it('should reset the board when resetGame is called', () => {
             resetGame();
             gridSections.forEach(section => {
                 expect(section.textContent).toBe('');
             });
             expect(currentPlayer).toBe('X');
-            expect(turnDisplay.textContent).toBe(`Player ${currentPlayer}'s Turn`);
+            expect(turnDisplay.textContent).toBe(`${dictionary[currentPlayer]}'s Turn`);
         });
 });
 
